@@ -1,0 +1,65 @@
+clc
+ clear all;
+ close all;
+obs=fopen('1742_6_00_1jun13.13O','rt');
+if obs~=-1
+ disp('observation file sucessfully opened');
+    else
+  disp('unable to open observation file');
+    return
+end
+frewind(obs);
+line=fgets(obs);
+version=sscanf(line,'%f',1);
+if version == 3.01
+    disp('version is 3.01');
+else
+    disp('old version file');
+end
+c=textscan(obs,'%c %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f ','HeaderLines',20,'delimiter','>');
+ for i=1:numel(c{1})
+ if c{1}(i)=='G'
+     c1(i,:)=0;
+ else if c{1}(i)=='R'
+     c1(i,:)=32;
+     else if c{1}(i)=='S'
+             c1(i,:)=64;
+         else
+             c1(i,:)=0;
+         end
+     end
+ end
+ end
+ c{2}=c1+c{2};
+ Y=c{2}(1);
+ M=c{3}(1);
+ D=c{4}(1);
+ H=c{5}(1);
+ min=c{6}(1);
+ sec=c{7}(1);
+ time1= GPS_week1(Y,M,D,H,min,sec);
+t11(1,:)=time1;
+ for i=2:length(c{2})
+ if c{2}(i)==2013;
+    t11(i,:)=t11((i-1),:)+1;
+     else
+         t11(i,:)=t11((i-1),:);
+ end
+end
+c{1,1}=t11;
+snum=input('Enter the PRN number');
+n=0;
+for i=2:length(c{2})
+if c{2}(i)==snum
+    n=n+1;
+    for j=1:length(c)
+    c3(n,j)=c{j}(i);
+    end
+
+   
+end
+end
+% plot(c3([1:25290],1),c3([1:25290],3));
+% figure,plot(c3([1:25290],1),c3([1:25290],5));
+% figure,plot(c3([1:25290],1),10*log10(c3([1:25290],8)));
+% figure,plot(c3([1:25290],1),c3([1:25290],9));
